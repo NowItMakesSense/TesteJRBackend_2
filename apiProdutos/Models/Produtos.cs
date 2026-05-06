@@ -53,15 +53,16 @@ namespace apiProdutos.Models
             }
         }
 
-
-        public void InserirProduto(ProdutoDTO Request)
+        public List<ProdutoDTO> InserirProduto(ProdutoDTO request)
         {
             try
             {
-                List<ProdutoDTO> lstResponse = lstProdutos();
-                lstResponse.Add(Request);
+                List<ProdutoDTO> lista = lstProdutos();
+
+                lista.Add(request);
+                return lista;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }

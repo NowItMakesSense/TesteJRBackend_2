@@ -1,9 +1,9 @@
 using apiProdutos.DTO;
 using apiProdutos.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace apiProdutos.Controllers
 {
@@ -19,6 +19,8 @@ namespace apiProdutos.Controllers
                 var produtoService = new Produtos();
                 var lista = produtoService.lstProdutos();
 
+                if (!lista.Any()) return NoContent();
+
                 return Ok(lista);
             }
             catch (Exception ex)
@@ -32,19 +34,24 @@ namespace apiProdutos.Controllers
         }
 
         [HttpPost("InserirProduto")]
-        public ActionResult InserirProduto([FromBody] ProdutoDTO Request)
+        public ActionResult<IEnumerable<ProdutoDTO>> InserirProduto([FromBody] ProdutoDTO request)
         {
             try
             {
+                if (request == null)  return BadRequest(new { msg = "Dados do produto não enviados." });
 
-                return StatusCode(200);
+                var produtoService = new Produtos();
+                var listaAtualizada = produtoService.InserirProduto(request);
 
-
+                return CreatedAtAction(nameof(GetProdutos), listaAtualizada);
             }
-
             catch (Exception ex)
             {
-                return StatusCode(400, new { msg = $"Ocorreu um erro em sua API {ex.Message}" });
+                return StatusCode(500, new
+                {
+                    msg = "Erro interno ao inserir produto",
+                    detalhe = ex.Message
+                });
             }
         }
 
