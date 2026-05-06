@@ -45,7 +45,7 @@ namespace apiProdutos.Models
                     QT_ESTOQUE = 0
                 });
 
-                return new List<ProdutoDTO>();
+                return lstProdutos;
             }
             catch(Exception ex)
             {

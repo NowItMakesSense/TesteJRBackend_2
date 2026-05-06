@@ -3,6 +3,7 @@ using apiProdutos.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 
 namespace apiProdutos.Controllers
 {
@@ -10,19 +11,23 @@ namespace apiProdutos.Controllers
     [Route("[controller]")]
     public class ProdutosController : ControllerBase
     {
-        [Authorize]
-        [HttpPost("lstProdutos")]
-        public ActionResult lstProdutos()
+        [HttpGet("lstProdutos")]
+        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutos()
         {
             try
             {
-              
-                return StatusCode(200);
-            }
+                var produtoService = new Produtos();
+                var lista = produtoService.lstProdutos();
 
+                return Ok(lista);
+            }
             catch (Exception ex)
             {
-                return StatusCode(400, new { msg = $"Ocorreu um erro em sua API {ex.Message}"});
+                return StatusCode(500, new
+                {
+                    msg = "Erro interno ao listar produtos",
+                    detalhe = ex.Message
+                });
             }
         }
 
