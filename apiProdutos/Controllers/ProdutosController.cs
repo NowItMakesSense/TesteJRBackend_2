@@ -63,18 +63,30 @@ namespace apiProdutos.Controllers
             }
         }
 
-        [HttpGet("DeletarProduto")]
-        public ActionResult DeleteProduto([FromQuery] int ID_PRODUTO)
+        [HttpDelete("{id}")]
+        public ActionResult<IEnumerable<ProdutoDTO>> DeleteProduto(int id)
         {
             try
             {
+                var produtoService = new Produtos();
+                var listaAtualizada = produtoService.DeletarProduto(id);
 
-                return StatusCode(200);
+                return Ok(listaAtualizada);
             }
-
+            catch (ProdutoNaoEncontradoException ex)
+            {
+                return NotFound(new
+                {
+                    msg = ex.Message
+                });
+            }
             catch (Exception ex)
             {
-                return StatusCode(400, new { msg = $"Ocorreu um erro em sua API {ex.Message}" });
+                return StatusCode(500, new
+                {
+                    msg = "Erro interno ao deletar produto",
+                    detalhe = ex.Message
+                });
             }
         }
 

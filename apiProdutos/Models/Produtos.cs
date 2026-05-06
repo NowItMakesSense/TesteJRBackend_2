@@ -48,7 +48,7 @@ namespace apiProdutos.Models
 
                 return lstProdutos;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -71,16 +71,21 @@ namespace apiProdutos.Models
             }
         }
 
-        public void DeletarProduto(int ID_PRODUTO)
+        public List<ProdutoDTO> DeletarProduto(int ID_PRODUTO)
         {
             try
             {
-                List<ProdutoDTO> lstResponse = lstProdutos();
-                var Produto = lstResponse.FirstOrDefault(x => x.ID_PRODUTO == ID_PRODUTO);
-                ProdutoDTO Produto2 = lstResponse.Where(x=> x.ID_PRODUTO == Produto.ID_PRODUTO).FirstOrDefault();
-                lstResponse.Remove(Produto2);
+                //Lista e procura o produto informado
+                var lista = lstProdutos();
+                var produto = lista.FirstOrDefault(x => x.ID_PRODUTO == ID_PRODUTO);
+
+                //Produto não existe
+                if (produto == null) throw new ProdutoNaoEncontradoException(ID_PRODUTO);
+
+                lista.Remove(produto);
+                return lista;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
