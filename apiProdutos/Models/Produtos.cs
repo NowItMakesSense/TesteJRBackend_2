@@ -1,4 +1,5 @@
 using apiProdutos.DTO;
+using apiProdutos.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,6 +59,8 @@ namespace apiProdutos.Models
             try
             {
                 List<ProdutoDTO> lista = lstProdutos();
+
+                if (lista.Any(x => x.ID_PRODUTO == request.ID_PRODUTO)) throw new ProdutoJaExisteException(request.ID_PRODUTO);
 
                 lista.Add(request);
                 return lista;

@@ -1,4 +1,5 @@
 using apiProdutos.DTO;
+using apiProdutos.Exceptions;
 using apiProdutos.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -44,6 +45,13 @@ namespace apiProdutos.Controllers
                 var listaAtualizada = produtoService.InserirProduto(request);
 
                 return CreatedAtAction(nameof(GetProdutos), listaAtualizada);
+            }
+            catch (ProdutoJaExisteException ex)
+            {
+                return Conflict(new
+                {
+                    msg = ex.Message
+                });
             }
             catch (Exception ex)
             {
