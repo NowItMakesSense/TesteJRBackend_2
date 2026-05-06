@@ -54,6 +54,24 @@ namespace apiProdutos.Models
             }
         }
 
+        public ProdutoDTO GetProdutoById(int ID_PRODUTO)
+        {
+            try
+            {
+                List<ProdutoDTO> lista = lstProdutos();
+                var produto = lista.FirstOrDefault(x => x.ID_PRODUTO == ID_PRODUTO);
+
+                //Produto informado nao encontrado
+                if (produto == null) throw new ProdutoNaoEncontradoException(ID_PRODUTO);
+
+                return produto;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public List<ProdutoDTO> InserirProduto(ProdutoDTO request)
         {
             try
@@ -114,6 +132,22 @@ namespace apiProdutos.Models
             {
                 throw ex;
             }
+        }
+
+        public List<ProdutoDTO> BuscarPorNome(string nome)
+        {
+            return lstProdutos().Where(x => x.NM_PRODUTO != null &&
+                                       x.NM_PRODUTO.Contains(nome, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        public List<ProdutoDTO> ListarSemEstoque()
+        {
+            return lstProdutos().Where(x => x.QT_ESTOQUE == 0).ToList();
+        }
+
+        public decimal CalcularValorTotalEstoque()
+        {
+            return lstProdutos().Sum(x => x.VL_PRECO * x.QT_ESTOQUE);
         }
     }
 }

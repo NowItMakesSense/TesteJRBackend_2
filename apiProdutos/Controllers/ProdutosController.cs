@@ -12,6 +12,33 @@ namespace apiProdutos.Controllers
     [Route("api/[controller]")]
     public class ProdutosController : ControllerBase
     {
+        [HttpGet("{id}")]
+        public ActionResult<ProdutoDTO> GetProdutos(int id)
+        {
+            try
+            {
+                var produtoService = new Produtos();
+                var produtoEncontrado = produtoService.GetProdutoById(id);
+
+                return Ok(produtoEncontrado);
+            }
+            catch (ProdutoNaoEncontradoException ex)
+            {
+                return NotFound(new
+                {
+                    msg = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    msg = "Erro interno ao deletar produto",
+                    detalhe = ex.Message
+                });
+            }
+        }
+
         [HttpGet("lstProdutos")]
         public ActionResult<IEnumerable<ProdutoDTO>> GetProdutos()
         {
@@ -29,6 +56,72 @@ namespace apiProdutos.Controllers
                 return StatusCode(500, new
                 {
                     msg = "Erro interno ao listar produtos",
+                    detalhe = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("BuscarPorNome")]
+        public ActionResult<IEnumerable<ProdutoDTO>> BuscarPorNome([FromQuery] string nome)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(nome)) return BadRequest(new { msg = "Informe um nome para busca." });
+
+                var produtoService = new Produtos();
+                var resultado = produtoService.BuscarPorNome(nome);
+
+                if (!resultado.Any()) return NoContent();
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    msg = "Erro ao buscar produtos",
+                    detalhe = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("BuscaSemEstoque")]
+        public ActionResult<IEnumerable<ProdutoDTO>> ListarSemEstoque()
+        {
+            try
+            {
+                var produtoService = new Produtos();
+                var lista = produtoService.ListarSemEstoque();
+
+                if (!lista.Any()) return NoContent();
+
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    msg = "Erro ao listar produtos sem estoque",
+                    detalhe = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("CalculaValorTotalEstoque")]
+        public ActionResult<decimal> CalcularValorTotalEstoque()
+        {
+            try
+            {
+                var produtoService = new Produtos();
+                var total = produtoService.CalcularValorTotalEstoque();
+
+                return Ok(total);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    msg = "Erro ao calcular valor do estoque",
                     detalhe = ex.Message
                 });
             }
