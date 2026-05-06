@@ -91,17 +91,24 @@ namespace apiProdutos.Models
             }
         }
 
-        public void AtualizarEstoque(int ID_PRODUTO, int QT_NOVA)
+        public ProdutoDTO AtualizarEstoque(int ID_PRODUTO, int QT_NOVA)
         {
             try
             {
-                List<ProdutoDTO> lstResponse = lstProdutos();
-                var Produto = lstResponse.Where(x => x.ID_PRODUTO == ID_PRODUTO).FirstOrDefault();
-                int estoqueAtual = Produto.QT_ESTOQUE;
+                var lista = lstProdutos();
+                var produto = lista.FirstOrDefault(x => x.ID_PRODUTO == ID_PRODUTO);
+
+                //Produto informado nao encontrado
+                if (produto == null) throw new ProdutoNaoEncontradoException(ID_PRODUTO);
+
+                int estoqueAtual = produto.QT_ESTOQUE;
                 int estoqueNovo = estoqueAtual + QT_NOVA;
-                Produto.QT_ESTOQUE = estoqueNovo;
-                int index = lstResponse.IndexOf(Produto);
-                lstResponse[index] = Produto;
+
+                //Estoque vazio
+                if (estoqueNovo < 0) throw new EstoqueInvalidoException();
+
+                produto.QT_ESTOQUE = estoqueNovo;
+                return produto;
             }
             catch(Exception ex)
             {

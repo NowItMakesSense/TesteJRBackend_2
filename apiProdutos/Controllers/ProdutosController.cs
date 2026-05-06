@@ -9,7 +9,7 @@ using System.Linq;
 namespace apiProdutos.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class ProdutosController : ControllerBase
     {
         [HttpGet("lstProdutos")]
@@ -39,7 +39,7 @@ namespace apiProdutos.Controllers
         {
             try
             {
-                if (request == null)  return BadRequest(new { msg = "Dados do produto não enviados." });
+                if (request == null) return BadRequest(new { msg = "Dados do produto não enviados." });
 
                 var produtoService = new Produtos();
                 var listaAtualizada = produtoService.InserirProduto(request);
@@ -63,13 +63,13 @@ namespace apiProdutos.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public ActionResult<IEnumerable<ProdutoDTO>> DeleteProduto(int id)
+        [HttpDelete("DeletarProduto")]
+        public ActionResult<IEnumerable<ProdutoDTO>> DeleteProduto([FromQuery] int ID_PRODUTO)
         {
             try
             {
                 var produtoService = new Produtos();
-                var listaAtualizada = produtoService.DeletarProduto(id);
+                var listaAtualizada = produtoService.DeletarProduto(ID_PRODUTO);
 
                 return Ok(listaAtualizada);
             }
@@ -90,18 +90,37 @@ namespace apiProdutos.Controllers
             }
         }
 
-        [HttpGet("AtualizarEstoque")]
-        public ActionResult AtualizarEstoque([FromQuery] int ID_PRODUTO, [FromQuery] int QT_NOVA)
+        [HttpPatch("AtualizarEstoque")]
+        public ActionResult<ProdutoDTO> AtualizarEstoque([FromQuery] int ID_PRODUTO, [FromQuery] int QT_NOVA)
         {
             try
             {
+                var produtoService = new Produtos();
+                var produtoAtualizado = produtoService.AtualizarEstoque(ID_PRODUTO, QT_NOVA);
 
-                return StatusCode(200);
+                return Ok(produtoAtualizado);
             }
-
+            catch (ProdutoNaoEncontradoException ex)
+            {
+                return BadRequest(new
+                {
+                    msg = ex.Message
+                });
+            }
+            catch (EstoqueInvalidoException ex)
+            {
+                return BadRequest(new
+                {
+                    msg = ex.Message
+                });
+            }
             catch (Exception ex)
             {
-                return StatusCode(400, new { msg = $"Ocorreu um erro em sua API {ex.Message}" });
+                return StatusCode(500, new
+                {
+                    msg = "Erro interno ao atualizar estoque",
+                    detalhe = ex.Message
+                });
             }
         }
     }
